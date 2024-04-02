@@ -38,25 +38,49 @@ function askQuestion(question) {
   });
 }
 
-async function authenticate() {
-  const cardNumber = await askQuestion('Masukkan nomor kartu: ');
-  if (!validateCardNumber(cardNumber)) {
-    console.log('Nomor kartu tidak valid');
-    return;
-  }
+function checkBalance(cardNumber) {
+  const account = accounts.find(account => account.cardNumber === cardNumber);
+  console.log(`Your current balance is ${account.balance}`);
+}
+
+function validatePin(cardNumber, pin) {
+  const account = accounts.find(account => account.cardNumber === cardNumber);
+  return account.pin === pin;
+}
+
+async function main() {
+  // let cardNumber = '5678 1234 5678 1234' // cardNumber's user input haven't been created, so i declare for testing
+  let pin;
+  
+  do {
+    pin = await askQuestion('Please enter your pin: ');
+    if (!validatePin(cardNumber, pin)) {
+      console.log('Invalid pin.');
+    }
+  } while (!validatePin(cardNumber, pin));
+
+  do {
+    console.log('Menu ATM:');
+    console.log('1. Cek Saldo');
+    console.log('2. Setor Tunai');
+    console.log('3. Riwayat Transaksi');
+    console.log('4. Keluar');
 
   const accountIndex = accounts.findIndex(
     (account) => account.cardNumber === cardNumber
   );
 
-  const pin = await askQuestion('Masukkan PIN: ');
-  if (!validatePin(pin, accountIndex)) {
-    console.log('PIN salah');
-    return;
-  }
-
-  currentAccountIndex = accountIndex;
-  console.log('Selamat datang,', accounts[accountIndex].name);
+    switch (parseInt(choice)) {
+      case 1:
+        checkBalance(cardNumber);
+        break;
+      case 4:
+        console.log('.........Exiting..........');
+        break;
+      default:
+        console.log('Invalid choice.')
+    }
+  } while (parseInt(choice) !== 4);
 }
 
 async function main() {
