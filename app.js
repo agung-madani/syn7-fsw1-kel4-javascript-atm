@@ -29,6 +29,11 @@ function validateCardNumber(enteredCardNumber) {
 }
 
 function validatePin(enteredPin, accountIndex) {
+  if (enteredPin.length !== 6) {
+    console.log('PIN harus terdiri dari 6 digit');
+    return false;
+  }
+
   return accounts[accountIndex].pin === enteredPin;
 }
 
@@ -37,6 +42,11 @@ function checkBalance() {
 }
 
 function deposit(amount) {
+  if (isNaN(amount) || amount <= 0) {
+    console.log('Jumlah deposit tidak valid');
+    return;
+  }
+
   accounts[currentAccountIndex].balance += amount;
   accounts[currentAccountIndex].transactions.push({
     type: 'Setoran Tunai',
@@ -104,26 +114,43 @@ async function main() {
 }
 
 async function authenticate() {
-  const cardNumber = await askQuestion('Masukkan nomor kartu: ');
-  if (!validateCardNumber(cardNumber)) {
-    console.log('Nomor kartu tidak valid');
-    return;
+  let attempt = 0;
+  try {
+    const cardNumber = await askQuestion('Masukkan nomor kartu: ');
+    if (!validateCardNumber(cardNumber)) {
+      console.log('Nomor kartu tidak valid');
+      return;
+    }
+
+    const accountIndex = accounts.findIndex(
+      (account) => account.cardNumber === cardNumber
+    );
+
+    do {
+      const pin = await askQuestion('Masukkan PIN: ');
+      if (validatePin(pin, accountIndex)) {
+        currentAccountIndex = accountIndex;
+        console.log('Selamat datang,', accounts[accountIndex].name);
+        return true;
+      } else {
+        attempt++;
+        console.log(`PIN salah. Anda memiliki ${3 - attempt} percobaan lagi.`);
+      }
+    } while (attempt < 3);
+
+    console.log('Anda telah melebihi batas percobaan PIN.');
+    return false;
+  } catch (error) {
+    console.error('Terjadi kesalahan:', error.message);
+    return false;
   }
-
-  const accountIndex = accounts.findIndex(
-    (account) => account.cardNumber === cardNumber
-  );
-
-  const pin = await askQuestion('Masukkan PIN: ');
-  if (!validatePin(pin, accountIndex)) {
-    console.log('PIN salah');
-    return;
-  }
-
-  currentAccountIndex = accountIndex;
-  console.log('Selamat datang,', accounts[accountIndex].name);
 }
 
-authenticate().then(() => {
-  main();
+authenticate().then((authenticated) => {
+  if (authenticated) {
+    main();
+  } else {
+    rl.close();
+    console.log('Autentikasi gagal');
+  }
 });
