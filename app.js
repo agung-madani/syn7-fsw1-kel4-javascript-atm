@@ -42,7 +42,22 @@ function checkBalance(cardNumber) {
   console.log(`Your current balance is ${account.balance}`);
 }
 
+function validatePin(cardNumber, pin) {
+  const account = accounts.find(account => account.cardNumber === cardNumber);
+  return account.pin === pin;
+}
+
 async function main() {
+  // let cardNumber = '5678 1234 5678 1234' // cardNumber's user input haven't been created, so i declare for testing
+  let pin;
+  
+  do {
+    pin = await askQuestion('Please enter your pin: ');
+    if (!validatePin(cardNumber, pin)) {
+      console.log('Invalid pin.');
+    }
+  } while (!validatePin(cardNumber, pin));
+
   do {
     console.log('Menu ATM:');
     console.log('1. Cek Saldo');
@@ -56,8 +71,13 @@ async function main() {
       case 1:
         checkBalance(cardNumber);
         break;
+      case 4:
+        console.log('.........Exiting..........');
+        break;
+      default:
+        console.log('Invalid choice.')
     }
-  } while (choice !== 4);
+  } while (parseInt(choice) !== 4);
 }
 
 main();
