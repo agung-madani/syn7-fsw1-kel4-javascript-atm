@@ -25,6 +25,10 @@ const accounts = [accountA, accountB];
 let currentAccountIndex = null;
 
 function validateCardNumber(enteredCardNumber) {
+  const cardNumberRegex = /^\d{4} \d{4} \d{4} \d{4}$/;
+  if (!cardNumberRegex.test(enteredCardNumber)) {
+    return false;
+  }
   return accounts.some((account) => account.cardNumber === enteredCardNumber);
 }
 
@@ -119,7 +123,7 @@ async function authenticate() {
     const cardNumber = await askQuestion('Masukkan nomor kartu: ');
     if (!validateCardNumber(cardNumber)) {
       console.log('Nomor kartu tidak valid');
-      return;
+      return false;
     }
 
     const accountIndex = accounts.findIndex(
