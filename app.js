@@ -1,6 +1,6 @@
-const readLine = require('readline');
+const readline = require('readline');
 
-const rl = readLine.createInterface({
+const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
@@ -24,16 +24,29 @@ const accountB = {
 const accounts = [accountA, accountB];
 let currentAccountIndex = null;
 
-function validateCardNumber() {}
-function validatePin(cardNumber, pin) {
-  const account = accounts.find((account) => account.cardNumber === cardNumber);
-  return account.pin === pin;
+function validateCardNumber(enteredCardNumber) {
+  return accounts.some((account) => account.cardNumber === enteredCardNumber);
 }
-function checkBalance(cardNumber) {
-  const account = accounts.find((account) => account.cardNumber === cardNumber);
-  console.log(`Your current balance is ${account.balance}`);
+
+function validatePin(enteredPin, accountIndex) {
+  return accounts[accountIndex].pin === enteredPin;
 }
-function deposit() {}
+
+function checkBalance() {
+  console.log(`Saldo Anda: Rp${accounts[currentAccountIndex].balance}`);
+}
+
+function deposit(amount) {
+  accounts[currentAccountIndex].balance += amount;
+  accounts[currentAccountIndex].transactions.push({
+    type: 'Setoran Tunai',
+    amount,
+  });
+  console.log(
+    `Setoran tunai berhasil. Saldo Anda saat ini: Rp${accounts[currentAccountIndex].balance}`
+  );
+}
+
 function viewTransactions(index) {
   return accounts[index].transactions;
 }
