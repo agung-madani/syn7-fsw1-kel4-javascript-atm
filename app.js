@@ -37,6 +37,11 @@ function askQuestion(question) {
   });
 }
 
+function checkBalance(cardNumber) {
+  const account = accounts.find(account => account.cardNumber === cardNumber);
+  console.log(`Your current balance is ${account.balance}`);
+}
+
 function validatePin(cardNumber, pin) {
   const account = accounts.find(account => account.cardNumber === cardNumber);
   return account.pin === pin;
@@ -64,6 +69,7 @@ async function main() {
 
     switch (parseInt(choice)) {
       case 1:
+        checkBalance(cardNumber);
         break;
       case 4:
         console.log('.........Exiting..........');
