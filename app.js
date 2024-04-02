@@ -22,6 +22,7 @@ const accountB = {
 };
 
 const accounts = [accountA, accountB];
+let currentAccountIndex = null;
 
 function validateCardNumber() {}
 function validatePin() {}
@@ -37,21 +38,62 @@ function askQuestion(question) {
   });
 }
 
-async function main() {
-  do {
-    console.log('Menu ATM:');
-    console.log('1. Cek Saldo');
-    console.log('2. Setor Tunai');
-    console.log('3. Riwayat Transaksi');
-    console.log('4. Keluar');
+async function authenticate() {
+  const cardNumber = await askQuestion('Masukkan nomor kartu: ');
+  if (!validateCardNumber(cardNumber)) {
+    console.log('Nomor kartu tidak valid');
+    return;
+  }
 
-    choice = await askQuestion('Masukkan pilihan Anda: ');
+  const accountIndex = accounts.findIndex(
+    (account) => account.cardNumber === cardNumber
+  );
 
-    switch (parseInt(choice)) {
-      case 1:
-        break;
-    }
-  } while (choice !== 4);
+  const pin = await askQuestion('Masukkan PIN: ');
+  if (!validatePin(pin, accountIndex)) {
+    console.log('PIN salah');
+    return;
+  }
+
+  currentAccountIndex = accountIndex;
+  console.log('Selamat datang,', accounts[accountIndex].name);
 }
 
-main();
+async function main() {
+  try {
+    do {
+      console.log('Menu ATM:');
+      console.log('1. Cek Saldo');
+      console.log('2. Setor Tunai');
+      console.log('3. Riwayat Transaksi');
+      console.log('4. Keluar');
+
+      choice = await askQuestion('Masukkan pilihan Anda: ');
+
+      switch (parseInt(choice)) {
+        case 1:
+          break;
+        case 2:
+          break;
+        case 3:
+          break;
+        case 4:
+          console.log('Terima kasih telah menggunakan ATM');
+          rl.close();
+          break;
+        default:
+          console.log('Pilihan tidak valid');
+      }
+    } while (choice !== 4);
+  } catch (error) {
+    console.error('Terjadi kesalahan:', error.message);
+  } finally {
+    if (rl) {
+      rl.close();
+    }
+  }
+}
+
+authenticate().then(() => {
+  main();
+});
