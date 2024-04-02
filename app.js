@@ -34,7 +34,9 @@ function checkBalance(cardNumber) {
   console.log(`Your current balance is ${account.balance}`);
 }
 function deposit() {}
-function viewTransactions() {}
+function viewTransactions(index) {
+  return accounts[index].transactions;
+}
 
 function askQuestion(question) {
   return new Promise((resolve) => {
