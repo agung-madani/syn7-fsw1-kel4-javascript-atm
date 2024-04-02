@@ -37,6 +37,11 @@ function askQuestion(question) {
   });
 }
 
+function checkBalance(cardNumber) {
+  const account = accounts.find(account => account.cardNumber === cardNumber);
+  console.log(`Your current balance is ${account.balance}`);
+}
+
 async function main() {
   do {
     console.log('Menu ATM:');
@@ -49,6 +54,7 @@ async function main() {
 
     switch (parseInt(choice)) {
       case 1:
+        checkBalance(cardNumber);
         break;
     }
   } while (choice !== 4);
