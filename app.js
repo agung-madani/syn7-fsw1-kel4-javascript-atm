@@ -1,6 +1,6 @@
-const readLine = require("readline");
+const readline = require('readline');
 
-const rl = readLine.createInterface({
+const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
@@ -22,33 +22,70 @@ const accountB = {
 };
 
 const accounts = [accountA, accountB];
+let currentAccountIndex = null;
 
-function validateCardNumber(accountArray) {
-  return accountArray.map((account) => {
-    const numericCardNumber = account.cardNumber.replace(/\D/g, "");
+function validateCardNumber(enteredCardNumber) {
+  const numericCardNumber = enteredCardNumber.replace(/\D/g, "");
+  const cardNumberRegex = /^\d{4} \d{4} \d{4} \d{4}$/;
+  if (!cardNumberRegex.test(numericCardNumber)) {
+    return false;
+  }
 
-    if (numericCardNumber.length !== 16) {
-      return false;
-    }
+  if (numericCardNumber.length !== 16) {
+    return false;
+  }
 
-    let sum = 0;
-    for (let i = numericCardNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(numericCardNumber[i], 10);
-      if ((numericCardNumber.length - i) % 2 === 0) {
-        digit *= 2;
-        if (digit > 9) {
-          digit -= 9;
-        }
+  let sum = 0;
+  for (let i = numericCardNumber.length - 1; i >= 0; i--) {
+    let digit = parseInt(numericCardNumber[i], 10);
+    if ((numericCardNumber.length - i) % 2 === 0) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
       }
-      sum += digit;
     }
-    return sum % 10 === 0;
-  });
+    sum += digit;
+  }
+  
+  if (sum % 10 !== 0) {
+    return false;
+  }
+
+  return accounts.some((account) => account.cardNumber === numericCardNumber);
 }
-function validatePin() {}
-function checkBalance() {}
-function deposit() {}
-function viewTransactions() {}
+
+function validatePin(enteredPin, accountIndex) {
+  if (enteredPin.length !== 6) {
+    console.log('PIN harus terdiri dari 6 digit');
+    return false;
+  }
+
+  return accounts[accountIndex].pin === enteredPin;
+}
+
+function checkBalance() {
+  console.log(`Saldo Anda: Rp${accounts[currentAccountIndex].balance}`);
+}
+
+function deposit(amount) {
+  if (isNaN(amount) || amount <= 0) {
+    console.log('Jumlah deposit tidak valid');
+    return;
+  }
+
+  accounts[currentAccountIndex].balance += amount;
+  accounts[currentAccountIndex].transactions.push({
+    type: 'Setoran Tunai',
+    amount,
+  });
+  console.log(
+    `Setoran tunai berhasil. Saldo Anda saat ini: Rp${accounts[currentAccountIndex].balance}`
+  );
+}
+
+function viewTransactions(index) {
+  return accounts[index].transactions;
+}
 
 function askQuestion(question) {
   return new Promise((resolve) => {
@@ -59,20 +96,87 @@ function askQuestion(question) {
 }
 
 async function main() {
-  do {
-    console.log("Menu ATM:");
-    console.log("1. Cek Saldo");
-    console.log("2. Setor Tunai");
-    console.log("3. Riwayat Transaksi");
-    console.log("4. Keluar");
+  try {
+    do {
+      console.log('Menu ATM:');
+      console.log('1. Cek Saldo');
+      console.log('2. Setor Tunai');
+      console.log('3. Riwayat Transaksi');
+      console.log('4. Keluar');
 
-    choice = await askQuestion("Masukkan pilihan Anda: ");
+      choice = await askQuestion('Masukkan pilihan Anda: ');
 
-    switch (parseInt(choice)) {
-      case 1:
-        break;
+      switch (parseInt(choice)) {
+        case 1:
+          checkBalance();
+          break;
+        case 2:
+          const amount = parseFloat(
+            await askQuestion('Masukkan jumlah setoran: ')
+          );
+          deposit(amount);
+          break;
+        case 3:
+          console.log('Riwayat Transaksi:');
+          viewTransactions(currentAccountIndex).forEach((transaction) => {
+            console.log(`- ${transaction.type}: Rp${transaction.amount}`);
+          });
+          break;
+        case 4:
+          console.log('Terima kasih telah menggunakan ATM');
+          rl.close();
+          break;
+        default:
+          console.log('Pilihan tidak valid');
+      }
+    } while (choice !== 4);
+  } catch (error) {
+    console.error('Terjadi kesalahan:', error.message);
+  } finally {
+    if (rl) {
+      rl.close();
     }
-  } while (choice !== 4);
+  }
 }
 
-main();
+async function authenticate() {
+  let attempt = 0;
+  try {
+    const cardNumber = await askQuestion('Masukkan nomor kartu: ');
+    if (!validateCardNumber(cardNumber)) {
+      console.log('Nomor kartu tidak valid');
+      return false;
+    }
+
+    const accountIndex = accounts.findIndex(
+      (account) => account.cardNumber === cardNumber
+    );
+
+    do {
+      const pin = await askQuestion('Masukkan PIN: ');
+      if (validatePin(pin, accountIndex)) {
+        currentAccountIndex = accountIndex;
+        console.log('Selamat datang,', accounts[accountIndex].name);
+        return true;
+      } else {
+        attempt++;
+        console.log(`PIN salah. Anda memiliki ${3 - attempt} percobaan lagi.`);
+      }
+    } while (attempt < 3);
+
+    console.log('Anda telah melebihi batas percobaan PIN.');
+    return false;
+  } catch (error) {
+    console.error('Terjadi kesalahan:', error.message);
+    return false;
+  }
+}
+
+authenticate().then((authenticated) => {
+  if (authenticated) {
+    main();
+  } else {
+    rl.close();
+    console.log('Autentikasi gagal');
+  }
+});
