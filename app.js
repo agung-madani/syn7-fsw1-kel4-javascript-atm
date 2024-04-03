@@ -11,13 +11,13 @@ async function main(currentAccountIndex) {
     let choice;
 
     do {
-      console.log('Menu ATM:');
-      console.log('1. Cek Saldo');
-      console.log('2. Setor Tunai');
-      console.log('3. Riwayat Transaksi');
-      console.log('4. Keluar');
+      console.log("Menu ATM:");
+      console.log("1. Cek Saldo");
+      console.log("2. Setor Tunai");
+      console.log("3. Riwayat Transaksi");
+      console.log("4. Keluar");
 
-      choice = await askQuestion('Masukkan pilihan Anda: ');
+      choice = await askQuestion("Masukkan pilihan Anda: ");
 
       switch (parseInt(choice)) {
         case 1:
@@ -25,12 +25,12 @@ async function main(currentAccountIndex) {
           break;
         case 2:
           const amount = parseFloat(
-            await askQuestion('Masukkan jumlah setoran: ')
+            await askQuestion("Masukkan jumlah setoran: ")
           );
           deposit(amount, currentAccountIndex);
           break;
         case 3:
-          console.log('Riwayat Transaksi:');
+          console.log("Riwayat Transaksi:");
           viewTransactions(currentAccountIndex).forEach((transaction) => {
             console.log(`- ${transaction.type}: Rp${transaction.amount}`);
           });
@@ -39,11 +39,11 @@ async function main(currentAccountIndex) {
           console.log('Terima kasih telah menggunakan ATM');
           break;
         default:
-          console.log('Pilihan tidak valid');
+          console.log("Pilihan tidak valid");
       }
     } while (choice != '4');
   } catch (error) {
-    console.error('Terjadi kesalahan:', error.message);
+    console.error("Terjadi kesalahan:", error.message);
   } finally {
     process.exit();
   }
