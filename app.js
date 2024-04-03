@@ -4,34 +4,35 @@ import {
   checkBalance,
   deposit,
   viewTransactions,
-} from './src/bankOperations.js';
+} from './src/atmOperations.js';
 
-async function main(currentAccountIndex) {
+async function main(account) {
   try {
     let choice;
 
     do {
-      console.log("Menu ATM:");
-      console.log("1. Cek Saldo");
-      console.log("2. Setor Tunai");
-      console.log("3. Riwayat Transaksi");
-      console.log("4. Keluar");
+      console.log('Menu ATM:');
+      console.log('1. Cek Saldo');
+      console.log('2. Setor Tunai');
+      console.log('3. Riwayat Transaksi');
+      console.log('4. Keluar');
 
-      choice = await askQuestion("Masukkan pilihan Anda: ");
+      choice = await askQuestion('Masukkan pilihan Anda: ');
+      console.clear();
 
       switch (parseInt(choice)) {
         case 1:
-          checkBalance(currentAccountIndex);
+          checkBalance(account.id);
           break;
         case 2:
           const amount = parseFloat(
-            await askQuestion("Masukkan jumlah setoran: ")
+            await askQuestion('Masukkan jumlah setoran: ')
           );
-          deposit(amount, currentAccountIndex);
+          deposit(amount, account.id);
           break;
         case 3:
-          console.log("Riwayat Transaksi:");
-          viewTransactions(currentAccountIndex).forEach((transaction) => {
+          console.log('Riwayat Transaksi:');
+          viewTransactions(account.id).forEach((transaction) => {
             console.log(`- ${transaction.type}: Rp${transaction.amount}`);
           });
           break;
@@ -39,11 +40,11 @@ async function main(currentAccountIndex) {
           console.log('Terima kasih telah menggunakan ATM');
           break;
         default:
-          console.log("Pilihan tidak valid");
+          console.log('Pilihan tidak valid');
       }
     } while (choice != '4');
   } catch (error) {
-    console.error("Terjadi kesalahan:", error.message);
+    console.error('Terjadi kesalahan:', error.message);
   } finally {
     process.exit();
   }

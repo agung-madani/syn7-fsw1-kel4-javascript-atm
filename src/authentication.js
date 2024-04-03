@@ -1,24 +1,24 @@
 import { askQuestion } from './utils.js';
-import { accounts } from './accounts.js';
+import fs from 'fs';
 
-async function authenticate() {
+const accounts = JSON.parse(fs.readFileSync('./data/accounts.json', 'utf8'));
+
+export async function authenticate() {
   let attempt = 0;
   try {
     const cardNumber = await askQuestion('Masukkan nomor kartu: ');
-    if (!validateCardNumber(cardNumber)) {
-      console.log('Nomor kartu tidak valid');
+
+    let account = validateCardNumber(cardNumber);
+    if (!account) {
+      console.log('Nomor kartu tidak ditemukan');
       return false;
     }
 
-    const accountIndex = accounts.findIndex(
-      (account) => account.cardNumber === cardNumber
-    );
-
     do {
       const pin = await askQuestion('Masukkan PIN: ');
-      if (validatePin(pin, accountIndex)) {
-        console.log('Selamat datang,', accounts[accountIndex].name);
-        return accountIndex;
+      if (validatePin(pin, account)) {
+        console.log('Selamat datang,', account.name);
+        return account;
       } else {
         attempt++;
         console.log(`PIN salah. Anda memiliki ${3 - attempt} percobaan lagi.`);
@@ -34,11 +34,9 @@ async function authenticate() {
 }
 
 function validateCardNumber(enteredCardNumber) {
-  return accounts.some((account) => account.cardNumber === enteredCardNumber);
+  return accounts.find((account) => account.cardNumber === enteredCardNumber);
 }
 
-function validatePin(enteredPin, accountIndex) {
-  return accounts[accountIndex].pin === enteredPin;
+function validatePin(enteredPin, account) {
+  return account.pin === enteredPin;
 }
-
-export { authenticate };

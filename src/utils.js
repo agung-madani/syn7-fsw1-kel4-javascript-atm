@@ -1,4 +1,7 @@
 import readline from 'readline';
+import fs from 'fs';
+
+const accounts = JSON.parse(fs.readFileSync('./data/accounts.json', 'utf8'));
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -13,4 +16,13 @@ function askQuestion(question) {
   });
 }
 
-export { askQuestion };
+function getAccount(id) {
+  let account = accounts.find((account) => account.id === id);
+  if (!account) {
+    console.log('Akun tidak ditemukan');
+    process.exit();
+  }
+  return account;
+}
+
+export { askQuestion, getAccount };
