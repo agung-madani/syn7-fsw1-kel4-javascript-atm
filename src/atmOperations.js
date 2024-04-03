@@ -1,7 +1,5 @@
 import fs from 'fs';
-import { getAccount } from './utils.js';
-
-const accounts = JSON.parse(fs.readFileSync('./data/accounts.json', 'utf8'));
+import { getAccount, getAllAccounts } from './utils.js';
 
 function checkBalance(id) {
   let account = getAccount(id);
@@ -14,6 +12,7 @@ function deposit(amount, id) {
     return;
   }
 
+  let accounts = getAllAccounts();
   let accountIndex = accounts.findIndex((account) => account.id === id);
   accounts[accountIndex].balance += amount;
   accounts[accountIndex].transactions.push({
@@ -24,7 +23,7 @@ function deposit(amount, id) {
   fs.writeFileSync('./data/accounts.json', JSON.stringify(accounts, null, 2));
 
   console.log(
-    `Setoran tunai berhasil. Saldo Anda saat ini: Rp${accounts[accountIndex].balance}`
+    `Deposit berhasil dilakukan. Saldo Anda saat ini: Rp${accounts[accountIndex].balance}`
   );
 }
 

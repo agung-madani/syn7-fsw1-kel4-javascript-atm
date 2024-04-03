@@ -1,7 +1,5 @@
 import { askQuestion } from './utils.js';
-import fs from 'fs';
-
-const accounts = JSON.parse(fs.readFileSync('./data/accounts.json', 'utf8'));
+import { getAllAccounts } from './utils.js';
 
 export async function authenticate() {
   let attempt = 0;
@@ -34,6 +32,7 @@ export async function authenticate() {
 }
 
 function validateCardNumber(enteredCardNumber) {
+  const accounts = getAllAccounts();
   return accounts.find((account) => account.cardNumber === enteredCardNumber);
 }
 

@@ -1,8 +1,6 @@
 import readline from 'readline';
 import fs from 'fs';
 
-const accounts = JSON.parse(fs.readFileSync('./data/accounts.json', 'utf8'));
-
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -17,6 +15,7 @@ function askQuestion(question) {
 }
 
 function getAccount(id) {
+  const accounts = getAllAccounts();
   let account = accounts.find((account) => account.id === id);
   if (!account) {
     console.log('Akun tidak ditemukan');
@@ -25,4 +24,12 @@ function getAccount(id) {
   return account;
 }
 
-export { askQuestion, getAccount };
+function getAllAccounts() {
+  try {
+    return JSON.parse(fs.readFileSync('./data/accounts.json', 'utf8'));
+  } catch (error) {
+    console.error('Gagal memuat ulang data akun:', error);
+  }
+}
+
+export { askQuestion, getAccount, getAllAccounts };

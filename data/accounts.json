@@ -2,10 +2,39 @@
   {
     "id": 1,
     "name": "John Doe",
-    "balance": 0,
+    "balance": 11290000,
     "pin": "123456",
     "cardNumber": "1234 5678 1234 5678",
-    "transactions": []
+    "transactions": [
+      {
+        "type": "Setoran Tunai",
+        "amount": 10000
+      },
+      {
+        "type": "Setoran Tunai",
+        "amount": 1000000
+      },
+      {
+        "type": "Setoran Tunai",
+        "amount": 200000
+      },
+      {
+        "type": "Setoran Tunai",
+        "amount": 30000
+      },
+      {
+        "type": "Setoran Tunai",
+        "amount": 10000000
+      },
+      {
+        "type": "Setoran Tunai",
+        "amount": 20000
+      },
+      {
+        "type": "Setoran Tunai",
+        "amount": 30000
+      }
+    ]
   },
   {
     "id": 2,
